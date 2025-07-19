@@ -10,25 +10,17 @@ export interface Player {
 }
 
 export interface GameState {
-  isMyTurn: boolean;
-  round: number;
-  myScore: number;
-  opponentScore: number;
-  totalRounds: number;
   mode: GameMode;
   roomCode: string;
   players: Player[];
+  grid: number[];
 }
 
 const initialState: GameState = {
-  myScore: 0,
-  opponentScore: 0,
-  round: 1,
-  totalRounds: 5,
-  isMyTurn: false,
   mode: 'friend',
   roomCode: '',
   players: [],
+  grid: [],
 };
 
 const gameSlice = createSlice({
@@ -40,10 +32,8 @@ const gameSlice = createSlice({
       mode?: GameMode;
       roomCode?: string;
       players?: Player[];
+      grid?: number[];
     }>) => {
-      if (action.payload.totalRounds !== undefined) {
-        state.totalRounds = action.payload.totalRounds;
-      }
       if (action.payload.mode !== undefined) {
         state.mode = action.payload.mode;
       }
@@ -53,18 +43,9 @@ const gameSlice = createSlice({
       if (action.payload.players !== undefined) {
         state.players = action.payload.players;
       }
-    },
-    addMyPoints: (state, action: PayloadAction<number>) => {
-      state.myScore += action.payload;
-    },
-    addOpponentPoints: (state, action: PayloadAction<number>) => {
-      state.opponentScore += action.payload;
-    },
-    toggleTurn: (state) => {
-      state.isMyTurn = !state.isMyTurn;
-    },
-    nextRound: (state) => {
-      state.round += 1;
+      if (action.payload.grid !== undefined) {
+        state.grid = action.payload.grid;
+      }
     },
     resetGame: () => initialState,
   },
@@ -72,10 +53,6 @@ const gameSlice = createSlice({
 
 export const {
   setGameConfig,
-  addMyPoints,
-  addOpponentPoints,
-  toggleTurn,
-  nextRound,
   resetGame,
 } = gameSlice.actions;
 

@@ -1,23 +1,29 @@
-import { useAppSelector } from '@/redux/hook';
+import { setGameConfig } from '@/redux/gameSlice';
+import { useAppDispatch, useAppSelector } from '@/redux/hook';
 import { socket } from '@/utils/socket';
 import { FontAwesome5, Ionicons } from '@expo/vector-icons';
 import { router, useNavigation } from 'expo-router';
 import React, { use, useEffect } from 'react';
 import { Text, TouchableOpacity, View } from 'react-native';
 
-const lobby = () => {
+const LobbyScreen = () => {
   const {roomCode, players} = useAppSelector((state) => state.game);
   const {id} = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
   // separating player 1 and player 2
   const player1 = players.find((player) => player.id === id);
   const player2 = players.find((player) => player.id !== id);
 
   useEffect(() => {
-    socket.on('start_game', () => {
+    socket.on('game_started', () => {
       router.replace('/game');
     });
+    socket.on('grid_updated', ({grid}) => {
+      console.log(`Grid updated: ${JSON.stringify(grid)}`);
+      dispatch(setGameConfig({ grid }));
+    })
     return () => {
-      socket.off('start_game');
+      socket.off('game_started');
     }
   }, []);
 
@@ -70,12 +76,12 @@ const lobby = () => {
             disabled={!(players.length == 2 && player1?.isHost)}
         >
             <Text className="text-white font-medium font-NunitoBold text-md">
-                {players.length == 2 && (player1?.isHost ? 'Start Game' : 'Waiting for host...')}
-                {players.length != 2 && 'Waiting for players...'}
+                {players.length == 2 && (player1?.isHost ? 'Start Game' : 'Waiting for host to start game...')}
+                {players.length != 2 && 'Waiting for other player...'}
             </Text>
         </TouchableOpacity>
     </View>
   )
 }
 
-export default lobby
+export default LobbyScreen

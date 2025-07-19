@@ -6,7 +6,6 @@ import { setGameConfig } from "@/redux/gameSlice";
 
 export const useSocketListeners = () => {
   const dispatch = useAppDispatch();
-  const { roomCode, players: gamePlayers } = useAppSelector((state) => state.game);
   // console.log("useSocketListeners called");
 
   useEffect(() => {
@@ -16,5 +15,6 @@ export const useSocketListeners = () => {
       dispatch(setGameConfig({ players }));
       // console.log("players:", gamePlayers);
     });
+    
   }, []);
 };

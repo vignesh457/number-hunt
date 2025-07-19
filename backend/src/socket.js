@@ -48,22 +48,34 @@ const setupSocket = (io) => {
 
       callback({ success: true });
       io.to(roomCode).emit("room_updated", {message: `${socket.id} joined`, players: rooms[roomCode]});
-
-      // if (rooms[roomCode].length === 2) {
-      //   io.to(roomCode).emit("start_game");
-      // }
     });
 
     socket.on("start_game", ({ roomCode }) => {
-      io.to(roomCode).emit("start_game");
+      const nums = Array.from({ length: 100 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+      io.to(roomCode).emit("grid_updated", {grid: nums});
+      console.log(`Game started in room ${roomCode} with grid ${nums}`);
+      io.to(roomCode).emit("game_started");
     });
 
     socket.on("select_number", ({ roomCode, number }) => {
-      socket.to(roomCode).emit("number_selected", number);
+      const opponent = rooms[roomCode].find((p) => p.id !== socket.userId);
+      io.to(roomCode).emit("number_selected", {
+        targetNumber: number,
+        targetPlayer: opponent.id,
+      });
     });
 
-    socket.on("number_found", ({ roomCode, points }) => {
-      socket.to(roomCode).emit("add_points", points);
+    socket.on("number_found", ({ roomCode, points, userId }) => {
+      const nums = Array.from({ length: 100 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+      io.to(roomCode).emit("grid_updated", {grid: nums});
+      console.log(`Game restarted in room ${roomCode} with grid ${nums}`);
+      io.to(roomCode).emit("add_points", { playerId: userId, points: points });
+    });
+
+    socket.on("end_game", ({ roomCode }) => {
+      io.to(roomCode).emit("game_ended");
+      rooms[roomCode] = [];
+      socket.leave(roomCode);
     });
 
     socket.on("disconnect", () => {

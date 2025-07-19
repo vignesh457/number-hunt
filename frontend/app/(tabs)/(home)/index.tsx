@@ -13,23 +13,17 @@ import { Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  // useRouteDebugger();
   useSocketListeners();
-  console.log("HomeScreen");
   const {username, id, isAuthenticated} = useAppSelector((state) => state.user);
   if (!isAuthenticated) {
       return <Redirect href="/signIn" />;
   }
+
   const dispatch = useAppDispatch();
- 
 
-  const handleCreateRoom = () => {
+  const handleCreatePress = () => {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-
-    socket.emit(
-      "create_room",
-      { roomCode: code, name: username, userId: id },
-      (response: any) => {
+    socket.emit("create_room", { roomCode: code, name: username, userId: id }, (response: any) => {
         if (!response.success) {
           dispatch(showAlert({ type: "error", message: response.message }));
           return; // 🚫 Stop if failed
@@ -37,10 +31,18 @@ export default function HomeScreen() {
 
         // ✅ Only proceed if room creation succeeded
         dispatch(setGameConfig({ roomCode: code, mode: "friend" }));
-        console.log("create room clicked");
         router.push("/createRoom");
       }
     );
+  };
+
+  const handleJoinPress = () => {
+      router.push('/joinRoom');
+  };
+
+  const handleSoloPress = () => {
+    router.push('/soloGame');
+    dispatch(setGameConfig({ mode : 'ai'}));
   };
 
   
@@ -51,7 +53,7 @@ export default function HomeScreen() {
         <TouchableOpacity className="flex-row items-center justify-center rounded-md p-2 h-12 bg-[#BFDBFE] w-[90%]" style={{
         boxShadow: 'rgba(50, 50, 93, 0.3) 3px 3px 15px, rgba(255, 255, 255, 0.8) 3px 3px 10px inset'
         }}
-        onPress={handleCreateRoom}
+        onPress={handleCreatePress}
         >
           <Entypo name="plus" size={16} color="#2563eb" className='mr-2'/>
           <Text className="text-blue-600 font-NunitoBold text-md">
@@ -61,7 +63,7 @@ export default function HomeScreen() {
         <TouchableOpacity className="flex-row items-center justify-center rounded-md bg-white/80 p-2 h-12 w-[90%]" style={{
         boxShadow: 'rgba(50, 50, 93, 0.3) 3px 3px 15px'
         }}
-        onPress={() => { console.log("join room clicked");router.push('/joinRoom'); dispatch(setGameConfig({ mode : 'friend'}))}}
+        onPress={handleJoinPress}
         >
           <Ionicons name="arrow-forward" size={16} color="#2563eb" className='mr-2'/>
           <Text className="text-blue-600 font-NunitoBold text-md">
@@ -75,11 +77,11 @@ export default function HomeScreen() {
         <TouchableOpacity className="flex-row items-center justify-center rounded-md p-2 h-12 bg-blue-200 w-[90%]" style={{
         boxShadow: 'rgba(50, 50, 93, 0.3) 3px 3px 15px, rgba(255, 255, 255, 0.8) 3px 3px 10px inset'
         }}
-        onPress={() => {console.log("find match clicked"); router.push('/game'); dispatch(setGameConfig({ mode : 'global'}))}}
+        onPress={handleSoloPress}
         >
           <Ionicons name="search" size={16} color="#2563eb" className='mr-2'/>
           <Text className="text-blue-600 font-NunitoBold text-md">
-            Find Match
+            Solo Hunting
           </Text>
         </TouchableOpacity>
       </View> 

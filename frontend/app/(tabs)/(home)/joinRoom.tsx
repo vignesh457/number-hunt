@@ -13,25 +13,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 
 export default function JoinRoom() {
-  // useRouteDebugger();
-  console.log("JoinRoom");
   const [roomCode, setRoomCode] = React.useState('');
   const {username, id} = useAppSelector((state) => state.user);
   const dispatch = useAppDispatch();
 
   const handleJoinRoom = () => {
-    socket.emit(
-      "join_room",
-      { roomCode, name: username, userId: id },
-      (response : any) => {
+    socket.emit("join_room", { roomCode, name: username, userId: id }, (response : any) => {
         if (!response.success) {
           dispatch(showAlert({ type: "error", message: response.message }));
           return; // 🚫 Stop here if error
         }
 
         // ✅ Proceed only if success:
-        dispatch(setGameConfig({ roomCode }));
-        console.log("lobby room clicked from joinRoom");
+        dispatch(setGameConfig({ roomCode, mode: "friend" }));
         router.push("/lobby");
       }
     );

@@ -6,6 +6,7 @@ import {images} from '@/constants/index';
 import { login } from '@/redux/userSlice';
 import { router, useNavigation } from 'expo-router';
 import { showAlert } from '@/redux/uiSlice';
+import { Particles } from "@/components/magicui/particles";
 
 export default function SignInScreen() {
   // useNavigationLogger("signIn");
@@ -21,6 +22,7 @@ export default function SignInScreen() {
 
   return (
     <SafeAreaView className='flex-1 items-center justify-start bg-[#1A3E5E]'>
+      <Particles />
       <View className="flex items-center justify-around p-8 w-[90%] h-[80%] rounded-2xl">
             <View className="text-center w-full mb-6 items-center">
               <View className=" flex items-center justify-center mb-4 rounded-md">

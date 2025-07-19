@@ -11,6 +11,10 @@ export default function HomeLayout() {
             title: 'Game',
             header: ({ options }) => <MyCustomHeaderComponent title={options.title} />
           }} />
+        <Stack.Screen name="soloGame" options={{
+            title: 'Solo Game',
+            header: ({ options }) => <MyCustomHeaderComponent title={options.title} />
+        }} />
         <Stack.Screen name="result" options={{
             title: 'Result',
             header: ({ options }) => <MyCustomHeaderComponent title={options.title} /> 
