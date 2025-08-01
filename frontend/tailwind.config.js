@@ -10,16 +10,18 @@ module.exports = {
             NunitoLight: ["Nunito-Light", "sans-serif"],
             NunitoSemiBold: ["Nunito-SemiBold", "sans-serif"],
             NunitoBold: ["Nunito-Bold", "sans-serif"],
+            NunitoLightest: ["Nunito-Lightest", "sans-serif"],
         },
         colors: {
             primary: {
-                100: "#E27139",
+                100: "#BBE1FA",
+                200: "#3282B8",
+                300: "#0F4C75",
+                400: "#012030",
             },
             secondary: {
-                100: "#DFDFDF",
-                200: "#525252",
-                300: "#262626",
-                400: "#000000",
+                100: "#FFCB61",
+                200: "#FF894F",
             },
             success: {
                 100: "#7EB489",

@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+// ALERT SLICE ----------------------------
 interface AlertState {
   visible: boolean;
   type: 'success' | 'error' | 'warning';
   message: string;
 }
 
-const initialState: AlertState = {
+const initialAlertState: AlertState = {
   visible: false,
   type: 'success',
   message: '',
@@ -14,7 +15,7 @@ const initialState: AlertState = {
 
 const alertSlice = createSlice({
   name: 'alert',
-  initialState,
+  initialState: initialAlertState,
   reducers: {
     showAlert: (
       state,
@@ -31,5 +32,50 @@ const alertSlice = createSlice({
   },
 });
 
+// POPUP SLICE ----------------------------
+interface PopupState {
+  visible: boolean;
+  title: string;
+  message: string;
+  confirmType?: 'exit' | null
+}
+
+const initialPopupState: PopupState = {
+  visible: false,
+  title: '',
+  message: '',
+  confirmType: null
+};
+
+const popupSlice = createSlice({
+  name: 'confirm',
+  initialState: initialPopupState,
+  reducers: {
+    showPopup: (
+      state,
+      action: PayloadAction<{
+        title: string;
+        message: string;
+        confirmType?: 'exit' | null;
+      }>
+    ) => {
+      state.visible = true;
+      state.title = action.payload.title;
+      state.message = action.payload.message;
+      state.confirmType = action.payload.confirmType
+    },
+    hidePopup: (state) => {
+      state.visible = false;
+      state.title = '';
+      state.message = '';
+      state.confirmType = null
+    },
+  },
+});
+
+// EXPORTS ----------------------------
 export const { showAlert, hideAlert } = alertSlice.actions;
-export default alertSlice.reducer;
+export const { showPopup, hidePopup } = popupSlice.actions;
+
+export const alertReducer = alertSlice.reducer;
+export const popupReducer = popupSlice.reducer;

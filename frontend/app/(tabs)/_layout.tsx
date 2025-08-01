@@ -1,26 +1,28 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
 import '@/global.css';
+import { StatusBar } from 'expo-status-bar';
 
 export default function TabLayout() {
 
   return (
+    <>
     <Tabs screenOptions={{
     tabBarStyle: {
-      backgroundColor: '#BFDBFE',
+      backgroundColor: '#000',
       borderRadius: 20,
       height: 70,
-      width: '95%',
+      width: '90%',
       alignSelf: 'center',
       paddingBottom: 10,
       paddingTop: 10,
-      marginBottom: 20,
-      boxShadow: 'rgba(50, 50, 93, 0.3) 3px 3px 15px, rgba(255, 255, 255, 0.8) 3px 3px 10px inset'
+      marginBottom: 15,
+      borderTopWidth: 0,
     },
-    tabBarActiveTintColor: '#2563eb', // active icon/text color
-    tabBarInactiveTintColor: '#2563eb', // inactive icon/text color
+    tabBarActiveTintColor: '#0ea5e9', // active icon/text color
+    tabBarInactiveTintColor: '#3282B8', // inactive icon/text color
     tabBarLabelStyle: {
-      fontSize: 12,
+      fontSize: 14,
       fontWeight: '600',
       fontFamily: 'Nunito-Bold',
     },
@@ -70,5 +72,7 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+    <StatusBar style="light" />
+    </>
   );
 }

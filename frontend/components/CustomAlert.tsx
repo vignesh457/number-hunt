@@ -6,7 +6,7 @@ import { hideAlert } from '@/redux/uiSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hook';
 
 const CustomAlert = () => {
-  const { visible, type, message } = useAppSelector((state: RootState) => state.ui);
+  const { visible, type, message } = useAppSelector((state: RootState) => state.alert);
   const dispatch = useAppDispatch();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -40,7 +40,7 @@ const CustomAlert = () => {
 
   return (
     <Animated.View
-      className="absolute top-0 left-0 w-full h-[55px] flex justify-start items-center pt-2 z-10"
+      className="absolute top-12 left-0 w-full h-[55px] flex justify-start items-center pt-2 z-10"
       style={{ opacity: fadeAnim }}
     >
       <View
@@ -53,7 +53,7 @@ const CustomAlert = () => {
         <Text
           numberOfLines={1}
           ellipsizeMode="tail"
-          className="text-secondary-300 text-md font-JakartaSemiBold ml-3"
+          className="text-secondary-300 text-md font-NunitoSemiBold ml-3"
         >
           {message}
         </Text>

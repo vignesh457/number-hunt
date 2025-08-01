@@ -1,21 +1,13 @@
 import { Image, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function GameSelectCard({children, title, description, image}: {children: React.ReactNode, title: string, description: string, image: any}) {
+export default function GameSelectCard({children, image}: {children: React.ReactNode, image: any}) {
   return (
-    <View className="flex items-center justify-center p-8 w-4/5 rounded-2xl bg-blue-300" style={{
-    boxShadow: 'rgba(50, 50, 93, 0.2) 5px 5px 20px, rgba(10, 37, 64, 0.5) 0px -2px 15px inset'
-    }}>
-      <View className="text-center w-full mb-6 items-center">
-        <View className=" flex items-center justify-center mb-4 rounded-md">
-          <Image source={image} className='w-16 h-16' />
+    <View className="h-auto w-[75%] flex items-center justify-center border-[1px] border-primary-300/60 gap-4 bg-black rounded-3xl p-6">
+      <View className="text-center w-full items-center">
+        <View className=" flex items-center justify-center rounded-md">
+          <Image source={image} className='w-44 h-44' />
         </View>
-
-        <Text className="text-2xl text-white mb-2 font-NunitoBold">
-          {title}
-        </Text>
-        <Text className="text-sky-100 text-sm text-center leading-relaxed font-NunitoSemiBold">
-          {description}
-        </Text>
       </View>
       {children}
     </View>

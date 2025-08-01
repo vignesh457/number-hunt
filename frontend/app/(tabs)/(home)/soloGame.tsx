@@ -1,3 +1,4 @@
+import CopyCode from '@/components/CopyCode';
 import Grid from '@/components/Grid';
 import { useAppSelector } from '@/redux/hook';
 import { router } from 'expo-router';
@@ -61,34 +62,40 @@ const SoloGameScreen = () => {
   };
 
   return (
-    <SafeAreaView className='flex-1 items-center justify-start bg-[#1A3E5E]'>
-      <View className="flex items-center justify-center gap-2 p-2 w-[90%] rounded-2xl">
-        <Text className="text-xl text-[#1A3E5E] bg-blue-200 rounded-2xl px-4 py-1 font-NunitoBold">
-          Round : {round > 5 ? 5 : round}/5
-        </Text>
+    <SafeAreaView className='flex-1 items-center justify-center bg-primary-400'>
+      <View className="flex-[0.8] items-center justify-between gap-4 p-2 w-[90%] rounded-2xl">
+        <View className='flex-row w-full h-11 items-center justify-between'>
+          <View className='w-[45%] h-full flex items-center justify-center rounded-xl p-1 bg-black'>
+            <Text className="w-full text-center text-xl font-NunitoSemiBold text-primary-100">Round : {round > 5 ? 5 : round}/5</Text>
+          </View>
+          <View className='w-[55%] h-full flex items-center justify-center'>
+            <CopyCode viewClassName='bg-primary-300/70'/>
+          </View>
+        </View>
+        
         <View className='flex-row w-full items-center justify-between'>
-          <View className='flex items-center justify-start rounded-xl p-1 bg-blue-200/10'>
-            <Text className="text-md text-blue-300 font-NunitoBold">
+          <View className='flex w-24 h-24 items-center justify-center rounded-[50%] p-2 bg-black'>
+            <Text className="text-md text-primary-100 font-NunitoBold">
               {playerName || "Me"}
             </Text>
-            <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-              <Text className='text-md text-blue-400 font-NunitoBold'>{myPoints}</Text>
+            <View className="flex items-center justify-center rounded-2xl h-10 w-10">
+              <Text className='text-md text-primary-200 font-NunitoBold'>{myPoints}</Text>
             </View>
           </View>
-          <View className='flex items-center justify-start rounded-xl p-1 bg-blue-200/10'>
-            <Text className="text-md text-blue-300 font-NunitoBold">AI</Text>
-            <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-              <Text className='text-md text-blue-400 font-NunitoBold'>0</Text>
+          <View className='flex w-24 h-24 items-center justify-center rounded-[50%] p-2 bg-black'>
+            <Text className="text-md text-primary-100 font-NunitoBold">AI</Text>
+            <View className="flex items-center justify-center rounded-2xl h-10 w-10">
+              <Text className='text-md text-primary-200 font-NunitoBold'>0</Text>
             </View>
           </View>
         </View>
-        <Text className={`text-xl text-blue-200 font-NunitoBold w-full text-center p-2`}>
+        <Text className={`text-xl bg-black rounded-lg text-secondary-100 border-[0.5px] border-orange-200/50 font-NunitoBold w-full text-center p-2`}>
           Points : {points}
         </Text>
       </View>
 
       <View className='flex items-center justify-center gap-4'>
-        <Text className='text-xl text-blue-200 font-NunitoBold'>
+        <Text className='text-2xl text-blue-200 font-NunitoSemiBold'>
           {targetNumber ? `Find ${targetNumber}` : "Get ready..."}
         </Text>
         <Grid

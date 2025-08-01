@@ -1,16 +1,18 @@
+import CopyCode from '@/components/CopyCode'
 import Grid from '@/components/Grid'
 import Timer from '@/components/Timer'
-import { useAppSelector } from '@/redux/hook'
+import { useAppDispatch, useAppSelector } from '@/redux/hook'
+import { showPopup } from '@/redux/uiSlice'
 import { socket } from '@/utils/socket'
-import { router } from 'expo-router'
-import React, { use, useEffect, useRef, useState } from 'react'
-import { Text, View } from 'react-native'
+import { router, useFocusEffect } from 'expo-router'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { BackHandler, Text, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 const GameScreen = () => {
   const { roomCode, players } = useAppSelector((s) => s.game);
     const userId = useAppSelector((s) => s.user.id);
-    const [points, setPoints] = useState(0);
+    const [points, setPoints] = useState(20);
   
     const myPlayer = players.find((p) => p.id === userId);
     const opponent = players.find((p) => p.id !== userId);
@@ -23,18 +25,46 @@ const GameScreen = () => {
   
     const myPointsRef = useRef(myPoints);
     const opponentPointsRef = useRef(opponentPoints);
+    // const hasSentZeroPoints = useRef(false);
+    const pointsRef = useRef(points);
+
+    const dispatch = useAppDispatch();
+
+    useFocusEffect(
+      useCallback(() => {
+        const onBackPress = () => {
+          dispatch(showPopup({ title: 'Exit Game', message: 'Are you sure you want to exit the game?', confirmType: 'exit' }));
+          return true;
+
+        };
+        const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+
+        return () => subscription.remove();
+      }, [dispatch])
+    );
+
     useEffect(() => {
       myPointsRef.current = myPoints;
       opponentPointsRef.current = opponentPoints;
     }, [myPoints, opponentPoints]);
+
+    useEffect(() => {
+      pointsRef.current = points;
+    }, [points]);
+
+    // useEffect(() => {
+    //   if (points === 0 && !hasSentZeroPoints.current) {
+    //     console.log("calling handleNumberFound(-1)");
+    //     hasSentZeroPoints.current = true;
+    //     handleNumberFound(-1);
+    //   }
+    // }, [points]);
+
   
     // 🔑 Listen for turn, number to find, etc.
     useEffect(() => {
-      socket.on("number_selected", ({ targetNumber, targetPlayer }) => {
-        // if (targetPlayer === userId) {
-        //   setTargetNumber(targetNumber);
-        //   console.log(`Target number: ${targetNumber} to ${myPlayer?.name}`);
-        // }
+      socket.on("number_selected", ({ targetNumber }) => {
+        // hasSentZeroPoints.current = false;
         setTargetNumber(targetNumber);
       });
   
@@ -47,7 +77,7 @@ const GameScreen = () => {
         }
         // switch turn
         setIsMyTurn(playerId === userId);
-        console.log(`isMyTurn: ${isMyTurn} (${userId})`);
+        // console.log(`isMyTurn: ${isMyTurn} (${userId})`);
         setTargetNumber(null);
         setRound((prev) => {
           const nextRound = prev + 1;
@@ -60,7 +90,7 @@ const GameScreen = () => {
       });
   
       socket.on("game_ended", () => {
-        console.log("Game ended ###");
+        // console.log("Game ended ###");
         router.replace({ 
           pathname: '/result',
           params: { me: myPlayer?.name, opponent: opponent?.name, mypoints: myPointsRef.current, opponentPoints: opponentPointsRef.current },
@@ -78,8 +108,14 @@ const GameScreen = () => {
     useEffect(() => {
       //points timer
       if (!targetNumber) return;
-      setPoints(30);
+      setPoints(20);
       const interval = setInterval(() => {
+        console.log(`Points: ${pointsRef.current} is my turn to find: ${!isMyTurn} targetNumber: ${targetNumber}`);
+        if (pointsRef.current === 0 && !isMyTurn && targetNumber !== null) {
+          handleNumberFound(-1);
+          clearInterval(interval);
+          return;
+        }
         setPoints((p) => Math.max(0, p - 1));
       }, 1000);
 
@@ -93,42 +129,50 @@ const GameScreen = () => {
     };
   
     const handleNumberFound = (num: number) => {
-      if (num !== targetNumber) return;
+      console.log(`Found number: ${num}`);
+      if(num === -1) {
+        socket.emit("number_found", { roomCode, points: 0, userId });
+        return;
+      }
       if (num === targetNumber) {
         socket.emit("number_found", { roomCode, points, userId });
       }
-      // else{
-      //   socket.emit("number_found", { roomCode, points: 0, userId });
-      // }
     };
   return (
-    <SafeAreaView className='flex-1 items-center justify-start bg-[#1A3E5E]'>
+    <SafeAreaView className="flex-1 items-center justify-center bg-primary-400">
       <View className="flex items-center justify-center gap-2 p-2 w-[90%] rounded-2xl" >
-        <Text className="text-xl text-[#1A3E5E] bg-blue-200 rounded-2xl px-4 py-1 font-NunitoBold">
-          Round : {Math.ceil(round/2)}/5
-        </Text>
+        <View className='flex-row w-full h-11 items-center justify-between'>
+          <View className='w-[45%] h-full flex items-center justify-center rounded-xl p-1 bg-black'>
+            <Text className="w-full text-center text-xl font-NunitoSemiBold text-primary-100">Round : {round > 5 ? 5 : round}/5</Text>
+          </View>
+          <View className='w-[55%] h-full flex items-end justify-center'>
+            <CopyCode viewClassName='bg-primary-300/70'/>
+          </View>
+        </View>
         {/* scores of players */}
         <View className='flex-row w-full items-center justify-between'>
-        <View className='flex items-center justify-start rounded-xl p-1 bg-blue-200/10'>
-          <Text className="text-md text-blue-300 font-NunitoBold">
+        <View className='flex w-22 h-22 items-center justify-center rounded-[50%] p-2 bg-success-100'>
+          <Text className="text-lg text-primary-300 font-NunitoBold">
             {myPlayer?.name || "Me"}
           </Text>
           <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-            <Text className='text-md text-blue-400 font-NunitoBold'>{myPoints}</Text>
+            <Text className='text-lg text-primary-300/80 font-Nunito'>{myPoints}</Text>
           </View>
         </View>
-        <View className='flex items-center justify-start rounded-xl p-1 bg-blue-200/10'>
-          <Text className="text-md text-blue-300 font-NunitoBold">
+        <View className='flex w-22 h-22 items-center justify-center rounded-[50%] p-2 bg-error-100'>
+          <Text className="text-lg text-primary-300 font-NunitoBold">
             {opponent?.name || "Opponent"}
           </Text>
           <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-            <Text className='text-md text-blue-400 font-NunitoBold'>{opponentPoints}</Text>
+            <Text className='text-lg text-primary-300/80 font-Nunito'>{opponentPoints}</Text>
           </View>
         </View>
         </View>
         {/* Timer */}
         {/* <Timer/> */}
-        <Text className={`text-xl text-blue-200 font-NunitoBold w-full text-center p-2 ${targetNumber ? "visible" : "invisible"}`}>Points : {points}</Text>
+        <Text className={`text-xl bg-black rounded-lg text-orange-200 border-[0.5px] border-orange-200/50 font-NunitoBold w-full text-center p-2 ${targetNumber ? "visible" : "visible"}`}>
+          Points : {points}
+        </Text>
         {/* comments on the game */}
       </View>
       {isMyTurn && (

@@ -13,7 +13,7 @@ import {
 
 import gameSlice from './gameSlice';
 import userSlice from './userSlice';
-import uiSlice from './uiSlice';
+import { alertReducer, popupReducer } from './uiSlice';
 
 const persistConfig = {
   key: 'game',
@@ -24,7 +24,8 @@ const persistConfig = {
 const rootReducer = combineReducers({
   game: gameSlice,
   user: userSlice,
-  ui: uiSlice,
+  alert: alertReducer,
+  popup: popupReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
