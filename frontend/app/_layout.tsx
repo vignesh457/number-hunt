@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import CustomAlert from '@/components/CustomAlert';
 import CustomSplashScreen from '@/components/CustomSplashScreen';
 import '@/global.css';
-import { store } from '@/redux/store';
+import { store, persistor } from '@/redux/store';
 import {
   Fredoka_300Light,
   Fredoka_400Regular,
@@ -19,6 +19,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Slot } from 'expo-router';
 import 'react-native-reanimated';
 import CustomPopup from '@/components/CustomPopup';
+import { PersistGate } from 'redux-persist/integration/react';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -34,7 +35,7 @@ export default function RootLayout() {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
-      background: '#012030',
+      background: '#001428',
     },
   };
 
@@ -69,8 +70,9 @@ export default function RootLayout() {
 
   return (
     <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
       <ThemeProvider value={CustomTheme}>
-        <View style={{ flex: 1, backgroundColor: '#012030' }} onLayout={onLayoutRootView}>
+        <View style={{ flex: 1, backgroundColor: '#001428' }} onLayout={onLayoutRootView}>
           <CustomAlert />
           <CustomPopup />
           {/* Slot will render the matched route */}
@@ -78,6 +80,7 @@ export default function RootLayout() {
           <StatusBar style="light"/>
         </View>
       </ThemeProvider>
+      </PersistGate>
     </Provider>
   );
 }

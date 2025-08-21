@@ -20,14 +20,14 @@ export default function Grid({ targetNumber, onNumberClick, disabled }: {
       {numbers.map((num) => (
         <TouchableOpacity
           key={num}
-          className='flex items-center justify-center rounded-md w-[30px] h-[30px] m-[2px]'
-          style={{
-            boxShadow: 'rgba(96, 165, 250, 0.2) 1px 1px 2px, rgba(96, 165, 250, 0.5) 1px 1px 1px inset'
-        }}
+          className='flex bg-primary-200/60 items-center justify-center rounded-md w-[30px] h-[30px] m-[2px] border-[1px] border-primary-200/60'
+        //   style={{
+        //     boxShadow: 'rgba(96, 165, 250, 0.2) 1px 1px 2px, rgba(96, 165, 250, 0.5) 1px 1px 1px inset'
+        // }}
           onPress={() => handlePress(num)}
           disabled={disabled}
         >
-          <Text className={`${num === targetNumber ? 'text-white' : 'text-blue-400'} text-blue-400 font-NunitoBold text-[14px]`}>{num}</Text>
+          <Text className={`${num === targetNumber ? 'text-primary-400' : 'text-primary-400'} text-blue-400 font-Nunito text-[16px]`}>{num}</Text>
         </TouchableOpacity>
       ))}
     </View>

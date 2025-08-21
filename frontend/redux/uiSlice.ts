@@ -37,14 +37,14 @@ interface PopupState {
   visible: boolean;
   title: string;
   message: string;
-  confirmType?: 'exit' | null
+  confirmType?: string;
 }
 
 const initialPopupState: PopupState = {
   visible: false,
   title: '',
   message: '',
-  confirmType: null
+  confirmType: ''
 };
 
 const popupSlice = createSlice({
@@ -56,7 +56,7 @@ const popupSlice = createSlice({
       action: PayloadAction<{
         title: string;
         message: string;
-        confirmType?: 'exit' | null;
+        confirmType?: string;
       }>
     ) => {
       state.visible = true;
@@ -68,7 +68,7 @@ const popupSlice = createSlice({
       state.visible = false;
       state.title = '';
       state.message = '';
-      state.confirmType = null
+      state.confirmType = '';
     },
   },
 });

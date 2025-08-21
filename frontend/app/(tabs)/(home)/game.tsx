@@ -1,18 +1,22 @@
 import CopyCode from '@/components/CopyCode'
 import Grid from '@/components/Grid'
 import Timer from '@/components/Timer'
+import { images } from '@/constants'
+import { setMyPoints, setOpponentPoints } from '@/redux/gameSlice'
 import { useAppDispatch, useAppSelector } from '@/redux/hook'
 import { showPopup } from '@/redux/uiSlice'
 import { socket } from '@/utils/socket'
 import { router, useFocusEffect } from 'expo-router'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { BackHandler, Text, View } from 'react-native'
+import { BackHandler, Text, View, Image } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import * as Progress from 'react-native-progress'
+import FlippingCoin from '@/components/FlippingCoin'
 
 const GameScreen = () => {
-  const { roomCode, players } = useAppSelector((s) => s.game);
+  const { roomCode, players, myPoints, opponentPoints } = useAppSelector((s) => s.game);
     const userId = useAppSelector((s) => s.user.id);
-    const [points, setPoints] = useState(20);
+    const [points, setPoints] = useState(30);
   
     const myPlayer = players.find((p) => p.id === userId);
     const opponent = players.find((p) => p.id !== userId);
@@ -20,12 +24,7 @@ const GameScreen = () => {
     const [isMyTurn, setIsMyTurn] = useState(myPlayer?.isHost);
     const [round, setRound] = useState(1);
     const [targetNumber, setTargetNumber] = useState<number | null>(null);
-    const [myPoints, setMyPoints] = useState(0);
-    const [opponentPoints, setOpponentPoints] = useState(0);
-  
-    const myPointsRef = useRef(myPoints);
-    const opponentPointsRef = useRef(opponentPoints);
-    // const hasSentZeroPoints = useRef(false);
+
     const pointsRef = useRef(points);
 
     const dispatch = useAppDispatch();
@@ -44,22 +43,11 @@ const GameScreen = () => {
     );
 
     useEffect(() => {
-      myPointsRef.current = myPoints;
-      opponentPointsRef.current = opponentPoints;
-    }, [myPoints, opponentPoints]);
-
-    useEffect(() => {
       pointsRef.current = points;
     }, [points]);
-
-    // useEffect(() => {
-    //   if (points === 0 && !hasSentZeroPoints.current) {
-    //     console.log("calling handleNumberFound(-1)");
-    //     hasSentZeroPoints.current = true;
-    //     handleNumberFound(-1);
-    //   }
-    // }, [points]);
-
+    useEffect(() => {
+      console.log(`myPoints: ${myPoints}, opponentPoints: ${opponentPoints}`);
+    },[myPoints, opponentPoints]);
   
     // 🔑 Listen for turn, number to find, etc.
     useEffect(() => {
@@ -70,10 +58,11 @@ const GameScreen = () => {
   
       socket.on("add_points", ({ playerId, points }) => {
         console.log(`Points added: ${points} by ${playerId === userId ? "you" : "opponent"} (${playerId})`);
+        // console.log(`myPoints: ${myPoints}, opponentPoints: ${opponentPoints}`);
         if (playerId === userId) {
-          setMyPoints((prev) => prev + points);
+          dispatch(setMyPoints(points ));
         } else {
-          setOpponentPoints((prev) => prev + points);
+          dispatch(setOpponentPoints(points));
         }
         // switch turn
         setIsMyTurn(playerId === userId);
@@ -81,7 +70,7 @@ const GameScreen = () => {
         setTargetNumber(null);
         setRound((prev) => {
           const nextRound = prev + 1;
-          if (Math.ceil(nextRound / 2) > 2) {
+          if (Math.ceil(nextRound / 2) > 5) {
             console.log("Emitting end_game now ###");
             socket.emit("end_game", { roomCode });
           }
@@ -93,7 +82,7 @@ const GameScreen = () => {
         // console.log("Game ended ###");
         router.replace({ 
           pathname: '/result',
-          params: { me: myPlayer?.name, opponent: opponent?.name, mypoints: myPointsRef.current, opponentPoints: opponentPointsRef.current },
+          params: { me: myPlayer?.name, opponent: opponent?.name },
         });
      });
 
@@ -108,9 +97,9 @@ const GameScreen = () => {
     useEffect(() => {
       //points timer
       if (!targetNumber) return;
-      setPoints(20);
+      setPoints(30);
       const interval = setInterval(() => {
-        console.log(`Points: ${pointsRef.current} is my turn to find: ${!isMyTurn} targetNumber: ${targetNumber}`);
+        // console.log(`Points: ${pointsRef.current} is my turn to find: ${!isMyTurn} targetNumber: ${targetNumber}`);
         if (pointsRef.current === 0 && !isMyTurn && targetNumber !== null) {
           handleNumberFound(-1);
           clearInterval(interval);
@@ -124,12 +113,12 @@ const GameScreen = () => {
   
     const pickNumber = (number: number) => {
       // if (!isMyTurn) return;
-      console.log(`Picked number: ${number} by ${myPlayer?.name}`);
+      // console.log(`Picked number: ${number} by ${myPlayer?.name}`);
       socket.emit("select_number", { roomCode, number });
     };
   
     const handleNumberFound = (num: number) => {
-      console.log(`Found number: ${num}`);
+      // console.log(`Found number: ${num}`);
       if(num === -1) {
         socket.emit("number_found", { roomCode, points: 0, userId });
         return;
@@ -139,45 +128,66 @@ const GameScreen = () => {
       }
     };
   return (
-    <SafeAreaView className="flex-1 items-center justify-center bg-primary-400">
-      <View className="flex items-center justify-center gap-2 p-2 w-[90%] rounded-2xl" >
+    <SafeAreaView className="flex-1 items-center justify-center bg-primary-400 gap-4">
+      <View className="flex-[0.8] items-center justify-between gap-4 p-2 w-[90%] rounded-2xl">
         <View className='flex-row w-full h-11 items-center justify-between'>
-          <View className='w-[45%] h-full flex items-center justify-center rounded-xl p-1 bg-black'>
-            <Text className="w-full text-center text-xl font-NunitoSemiBold text-primary-100">Round : {round > 5 ? 5 : round}/5</Text>
+          <View className='w-[45%] h-full flex items-center justify-center rounded-xl p-2 border-[1px] border-primary-300/70 bg-black'>
+            <Text className="w-full text-center text-xl font-NunitoSemiBold text-primary-100">⚔️ Round : {Math.ceil(round / 2) > 5 ? 5 : Math.ceil(round / 2)}/5</Text>
           </View>
-          <View className='w-[55%] h-full flex items-end justify-center'>
-            <CopyCode viewClassName='bg-primary-300/70'/>
+          <View className='w-[55%] h-full flex items-center justify-center'>
+            <CopyCode viewClassName='bg-primary-400'/>
           </View>
         </View>
         {/* scores of players */}
         <View className='flex-row w-full items-center justify-between'>
-        <View className='flex w-22 h-22 items-center justify-center rounded-[50%] p-2 bg-success-100'>
-          <Text className="text-lg text-primary-300 font-NunitoBold">
-            {myPlayer?.name || "Me"}
-          </Text>
-          <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-            <Text className='text-lg text-primary-300/80 font-Nunito'>{myPoints}</Text>
+          <View className='flex w-36 items-start justify-center p-4 bg-success-100 rounded-xl mr-4'>
+            <Text className="text-md text-base w-[80%] text-primary-400 font-NunitoSemiBold"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {myPlayer?.name || "Me"}
+            </Text>
+            <View className="absolute top-[-3px] right-[-8px] bg-black border-success-100 border-2 flex items-center justify-center rounded-3xl h-16 w-16">
+              <Image source={images.coin} className='w-5 h-5' />
+              <Text className='text-lg text-success-100 font-Nunito'>{myPoints}</Text>
+            </View>
           </View>
-        </View>
-        <View className='flex w-22 h-22 items-center justify-center rounded-[50%] p-2 bg-error-100'>
-          <Text className="text-lg text-primary-300 font-NunitoBold">
-            {opponent?.name || "Opponent"}
-          </Text>
-          <View className="flex items-center justify-center rounded-2xl h-10 w-10 mx-4">
-            <Text className='text-lg text-primary-300/80 font-Nunito'>{opponentPoints}</Text>
+          <View className='flex w-36 items-start justify-center p-4 bg-error-100 rounded-xl mr-4'>
+            <Text className="text-md text-base w-[80%] text-primary-400 font-NunitoSemiBold"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {opponent?.name || "Waiting..."}
+            </Text>
+            <View className="absolute top-[-3px] right-[-8px] bg-black border-error-100 border-2 flex items-center justify-center rounded-3xl h-16 w-16">
+              <Image source={images.coin} className='w-5 h-5' />
+              <Text className='text-lg text-error-100 font-Nunito'>{opponentPoints}</Text>
+            </View>
           </View>
-        </View>
         </View>
         {/* Timer */}
-        {/* <Timer/> */}
-        <Text className={`text-xl bg-black rounded-lg text-orange-200 border-[0.5px] border-orange-200/50 font-NunitoBold w-full text-center p-2 ${targetNumber ? "visible" : "visible"}`}>
-          Points : {points}
-        </Text>
+        <View className="flex flex-row items-center justify-center bg-primary-300/20 rounded-lg border-[0.5px] border-primary-300 w-full p-2">
+          <FlippingCoin />
+          <Progress.Bar 
+            progress={(points / 30) || 0} 
+            width={240} 
+            height={14} 
+            color="#FFCB61" 
+            unfilledColor="#000"
+            borderRadius={10}
+            borderWidth={1}
+            borderColor="#FFCB61"
+            style={{margin: "auto"}}
+            animationType="timing"
+          />
+        </View>
         {/* comments on the game */}
       </View>
       {isMyTurn && (
-        <View className='flex items-center justify-center gap-4'>
-          <Text className='text-xl text-blue-100 font-NunitoBold'>{targetNumber ? `Opponent is searching for ${targetNumber}...`: "Assign a number"}</Text>
+        <View className='flex w-full items-center justify-center gap-4'>
+          <View className="flex flex-row items-center justify-center bg-primary-300/20 rounded-lg border-[0.5px] border-primary-300 w-[90%] p-2"> 
+            <Text className='text-xl text-primary-100/90 font-Nunito'>{targetNumber ? `Opponent is searching for ${targetNumber}...`: "Assign a number"}</Text>
+          </View>
           <Grid
             targetNumber={targetNumber}
             onNumberClick={pickNumber}
@@ -186,8 +196,10 @@ const GameScreen = () => {
         </View>
       )}
       {!isMyTurn && (
-        <View className='flex items-center justify-center gap-4'>
-          <Text className='text-xl text-blue-200 font-NunitoBold'>{targetNumber ? `Find ${targetNumber}`: "Opponent is assigning a number..." }</Text>
+        <View className='flex w-full items-center justify-center gap-4'>
+          <View className="flex flex-row items-center justify-center bg-primary-300/20 rounded-lg border-[0.5px] border-primary-300 w-[90%] p-2"> 
+            <Text className='text-xl text-blue-200 font-NunitoSemiBold'>{targetNumber ? `Find ${targetNumber}`: "Opponent is assigning a number..." }</Text>
+          </View>
           <Grid
             targetNumber={targetNumber}
             onNumberClick={handleNumberFound}
@@ -195,6 +207,9 @@ const GameScreen = () => {
           />
         </View>
       )}
+      <View className='w-full h-32 bg-black mt-4'>
+          {/* Ads section */}
+      </View>
     </SafeAreaView>
   )
 }

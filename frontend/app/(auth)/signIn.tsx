@@ -16,7 +16,6 @@ import { images } from '@/constants/index';
 import { login } from '@/redux/userSlice';
 import { router } from 'expo-router';
 import { showAlert, showPopup } from '@/redux/uiSlice';
-import { MotiView } from 'moti';
 import BackgroundWrapper from '@/components/backgroundWrapper';
 
 export default function SignInScreen() {
@@ -25,7 +24,7 @@ export default function SignInScreen() {
 
   const handleSubmit = () => {
     if (!name) return;
-    const id = name + Math.floor(100000 + Math.random() * 900000).toString();
+    const id = name + '_' + Date.now().toString(36) + Math.floor(100 + Math.random() * 900).toString(36);
     dispatch(login({ id, username: name }));
     dispatch(showPopup({
       title: 'How to Play',

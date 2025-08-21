@@ -14,11 +14,12 @@ import {
 import gameSlice from './gameSlice';
 import userSlice from './userSlice';
 import { alertReducer, popupReducer } from './uiSlice';
+import leaderboardSlice from './leaderboardSlice';
 
 const persistConfig = {
-  key: 'game',
+  key: 'root',
   storage: AsyncStorage,
-  whitelist: ['game'],
+  whitelist: ['game', 'user', 'leaderboard'], // Only persist these slices
 };
 
 const rootReducer = combineReducers({
@@ -26,6 +27,7 @@ const rootReducer = combineReducers({
   user: userSlice,
   alert: alertReducer,
   popup: popupReducer,
+  leaderboard: leaderboardSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

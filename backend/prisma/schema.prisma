@@ -8,8 +8,7 @@ datasource db {
 }
 
 model Leaderboard {
-  id     String @id @default(uuid())
-  name   String
-  points Int
-  createdAt DateTime @default(now())
+  userId     String  @id
+  highscore  Int
 }
+

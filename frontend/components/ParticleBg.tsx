@@ -1,72 +1,56 @@
 import React from 'react';
 import { View, Dimensions, Text } from 'react-native';
-import { MotiView } from 'moti';
-import { Easing } from 'react-native-reanimated';
-
 
 const { width, height } = Dimensions.get('window');
 
 const getRandom = (min: number, max: number) => Math.random() * (max - min) + min;
 const getRandomInt = (min: number, max: number) => Math.floor(getRandom(min, max));
 
-const NUM_PARTICLES = 50;
+const cols = 5;
+const rows = 8;
+const NUM_PARTICLES = cols * rows; // fewer for performance
 
-const FloatingNumber = () => {
-  const startX = getRandom(0, width - 30);
-  const startY = getRandom(0, height - 30);
-  const deltaX = getRandom(-80, 80);
-  const deltaY = getRandom(-80, 80);
-  const endX = startX + deltaX;
-  const endY = startY + deltaY;
-
-  const duration = getRandom(3000, 8000);
-  const fontSize = getRandom(14, 24);
-
+const ParticleBackground = () => {
   return (
-    <MotiView
-      from={{
-        translateX: startX,
-        translateY: startY,
-        opacity: 0.5,
+    <View
+      style={{
+        position: 'absolute',
+        width,
+        height,
+        zIndex: -1,
+        flexWrap: 'wrap',
       }}
-      animate={{
-        translateX: endX,
-        translateY: endY,
-        opacity: 0.8,
-      }}
-      transition={{
-        type: 'timing',
-        duration,
-        loop: true,
-        repeatReverse: true,
-        easing: Easing.inOut(Easing.ease),
-        delay: getRandom(0, 1500),
-      }}
-      style={{ position: 'absolute' }}
     >
-      <Text style={{
-        fontSize,
-        color: 'rgba(14, 165, 233, 0.3)',
-        fontWeight: 'bold',
-      }}>
-        {getRandomInt(1, 100)}
-      </Text>
-    </MotiView>
-  );
-};
-function ParticleBackground() {
-  return (
-    <View style={{
-      position: 'absolute',
-      width,
-      height,
-      zIndex: -1,
-    }}>
-      {Array.from({ length: NUM_PARTICLES }).map((_, i) => (
-        <FloatingNumber key={i} />
-      ))}
+      {Array.from({ length: NUM_PARTICLES }).map((_, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+
+        // scatter within each grid cell
+        const x = (col * width) / cols + getRandom(0, width / cols - 30);
+        const y = (row * height) / rows + getRandom(0, height / rows - 30);
+        const fontSize = getRandom(12, 22);
+        const opacity = getRandom(0.3, 0.8);
+
+        return (
+          <Text
+            key={i}
+            style={{
+              position: 'absolute',
+              left: x,
+              top: y,
+              fontSize,
+              color: 'rgba(14, 165, 233, 0.3)', // brighter visibility
+              fontWeight: '600',
+              opacity,
+              fontFamily: 'Nunito-Regular',
+            }}
+          >
+            {getRandomInt(1, 100)}
+          </Text>
+        );
+      })}
     </View>
   );
-}
+};
 
 export default React.memo(ParticleBackground);

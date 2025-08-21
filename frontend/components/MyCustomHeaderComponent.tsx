@@ -11,7 +11,7 @@ export default function MyCustomHeaderComponent({ title }: { title: string | und
         }}
         onPress={() => {router.back()}}
        >
-        <Ionicons name="arrow-back" size={24} color="#012030"/>
+        <Ionicons name="arrow-back" size={24} color="#001428"/>
       </TouchableOpacity>
 
       <Text className="text-sky-500 text-3xl font-NunitoBold w-2/3">{title}</Text>

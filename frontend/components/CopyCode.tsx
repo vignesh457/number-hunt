@@ -15,13 +15,13 @@ const CopyCode = ({viewClassName, textClassName}:{viewClassName?:string, textCla
     };
 
   return (
-    <Pressable className={`flex-row items-center justify-evenly bg-primary-400 border-[1px] border-primary-300 rounded-xl p-2 w-[90%] ${viewClassName}`}
+    <Pressable className={`flex-row items-center justify-evenly bg-primary-400 border-[1px] border-primary-300/80 rounded-xl p-2 w-[90%] ${viewClassName}`}
         onPress={handleCopy} 
     >
         <Text className={`flex-1 text-center tracking-[4px] pl-5 text-xl font-NunitoLight text-primary-100 ${textClassName}`}>
             {copied ? 'Copied!' : roomCode}
         </Text>
-        <MaterialIcons name={copied ? 'check' : 'content-copy'} size={18} color="#3282B1" className='mr-2' />
+        <MaterialIcons name={copied ? 'check' : 'content-copy'} size={18} color="#3282B1" className='mr-2 pt-[2px]' />
     </Pressable>
   )
 }

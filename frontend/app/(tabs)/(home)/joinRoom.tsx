@@ -51,7 +51,7 @@ export default function JoinRoom() {
           onPress={Keyboard.dismiss}
           accessible={false}
         >
-            <View className="h-full w-full flex items-center justify-center">
+            <View className="h-[85%] w-full flex items-center justify-center">
               <GameSelectCard image={images.roomjoin}>
                 <View className="h-auto w-full flex items-center justify-center gap-4">
                   <TextInput
@@ -65,6 +65,9 @@ export default function JoinRoom() {
               </GameSelectCard>
             </View>
         </TouchableWithoutFeedback>
+        <View className='w-full h-[15%] bg-black mt-4'>
+            {/* Ads section */}
+        </View>
     </BackgroundWrapper>
   );
 }

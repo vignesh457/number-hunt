@@ -18,7 +18,7 @@ const setupSocket = (io) => {
 
       callback({ success: true });
       console.log(`Room ${roomCode} created by ${name} with id ${socket.id} (${userId})`);
-      io.to(roomCode).emit("room_updated", {message: `${socket.id} created`, players: rooms[roomCode]});
+      io.to(roomCode).emit("room_updated", {status: 'success', message: `Room created successfully`, players: rooms[roomCode]});
     });
 
 
@@ -47,8 +47,32 @@ const setupSocket = (io) => {
       rooms[roomCode].push({ id: userId, name, isHost: false });
 
       callback({ success: true });
-      io.to(roomCode).emit("room_updated", {message: `${socket.id} joined`, players: rooms[roomCode]});
+      io.to(roomCode).emit("room_updated", {status: 'success', message: `${userId} successfully joined`, players: rooms[roomCode]});
     });
+
+    socket.on("leave_room", ({ roomCode, userId }) => {
+      if (rooms[roomCode]) {
+        // Remove the player
+        rooms[roomCode] = rooms[roomCode].filter((p) => p.id !== userId);
+        socket.leave(roomCode);
+
+        if (rooms[roomCode].length === 0) {
+          // No players left → delete room
+          delete rooms[roomCode];
+        } else {
+          // If the host left, promote another player as host
+          if (!rooms[roomCode].some((p) => p.isHost)) {
+            rooms[roomCode][0].isHost = true; // make the first remaining player the new host
+          }
+
+          io.to(roomCode).emit("room_updated", { 
+            message: `${userId} left`, 
+            players: rooms[roomCode] 
+          });
+        }
+      }
+    });
+
 
     socket.on("start_game", ({ roomCode }) => {
       const nums = Array.from({ length: 100 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
@@ -58,7 +82,9 @@ const setupSocket = (io) => {
     });
 
     socket.on("select_number", ({ roomCode, number }) => {
+      if (!rooms[roomCode]) return;
       const opponent = rooms[roomCode].find((p) => p.id !== socket.userId);
+      if (!opponent) return;
       io.to(roomCode).emit("number_selected", {
         targetNumber: number,
         targetPlayer: opponent.id,
@@ -90,7 +116,7 @@ const setupSocket = (io) => {
         } else {
           // Notify remaining players
           console.log(`Room ${roomCode} updated on disconnect by ${socket.userId}`);
-          io.to(roomCode).emit("room_updated", {message: `${socket.userId} disconnected`, players: rooms[roomCode]});
+          io.to(roomCode).emit("room_updated", {status: 'warning', message: `${socket.userId} disconnected`, players: rooms[roomCode]});
         }
       }
     });

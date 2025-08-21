@@ -23,12 +23,17 @@ export default function CreateRoom() {
 
   return (
     <BackgroundWrapper className='justify-center'>
+      <View className="h-[85%] w-full flex items-center justify-center">
         <GameSelectCard image={images.roomcreated}>
-        <View className="h-auto w-full flex items-center justify-center gap-4">
-          <CopyCode viewClassName='w-[75%]' />
-          <CustomButton handleClick={handleCreateRoom} btnText="Enter Room" />
-        </View> 
-      </GameSelectCard>
+          <View className="h-auto w-full flex items-center justify-center gap-4">
+            <CopyCode viewClassName='w-[75%]' />
+            <CustomButton handleClick={handleCreateRoom} btnText="Enter Room" />
+          </View> 
+        </GameSelectCard>
+      </View>
+      <View className='w-full h-[15%] bg-black mt-4'>
+          {/* Ads section */}
+      </View>
     </BackgroundWrapper>
   )
 }
