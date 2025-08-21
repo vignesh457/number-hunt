@@ -27,7 +27,7 @@ export default function SoloResultScreen() {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ userId: id, highscore: 200 }),
+      body: JSON.stringify({ userId: id, highscore: highScore }),
     });
 
     if (!res.ok) {
