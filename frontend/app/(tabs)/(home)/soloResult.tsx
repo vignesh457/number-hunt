@@ -22,7 +22,7 @@ export default function SoloResultScreen() {
   if (gameStatus === 2) return;
 
   try {
-    const res = await fetch('http://192.168.1.3:3000/api/leaderboard', {
+    const res = await fetch('https://number-hunt-g5fp.onrender.com/api/leaderboard', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

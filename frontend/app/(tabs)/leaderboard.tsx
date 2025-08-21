@@ -15,7 +15,7 @@ const LeaderboardScreen = () => {
     // Fetch leaderboard data from the server or store it in state
     console.log("Fetching leaderboard data...");
     try {
-      const response = await fetch('http://192.168.1.3:3000/api/leaderboard');
+      const response = await fetch('https://number-hunt-g5fp.onrender.com/api/leaderboard');
       if (!response.ok) {
         throw new Error('Failed to fetch leaderboard data');
       }
